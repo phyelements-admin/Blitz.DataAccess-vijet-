@@ -18,7 +18,7 @@ namespace Blitz.Api.Controllers
 
         [HttpGet]
         [Route("/GetAll")]//get all projects its name,id,and startdate
-        public IEnumerable<Project> Get()
+        public List<Project> Get()
         {
             return projectDAO.GetProjects();
 

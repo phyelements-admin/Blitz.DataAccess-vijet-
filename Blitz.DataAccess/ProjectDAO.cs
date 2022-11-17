@@ -19,23 +19,10 @@ namespace Blitz.DataAccess
         //Function to add a new project
         public int AddProject(Project p)
         {
-          
-            using (SqlConnection connection =DBCommon.GetConnection())  
-                
-            {
-                SqlCommand command = new SqlCommand();
-                command.CommandType= CommandType.Text;
-                command.CommandText = "INSERT INTO Project_Table (Id,Name,StartDate) Values (@Id,@Name,@StartDate)";
-                command.Connection = connection;
 
-                command.Parameters.AddWithValue("@Id", p.Id);
-                command.Parameters.AddWithValue("@Name", p.Name);
-                command.Parameters.AddWithValue("@StartDate", p.StartDate);
+            //return DBCommon.ExecuteNonQuerySql(" INSERT INTO Project_Table (ID,Name,StartDate) VALUES (10,'Vijet','2021 - 11 - 17 06:04:40.433'); ");
+            return DBCommon.ExecuteNonQuerySql("DELETE from Project_Table where Id=10;");
 
-                connection.Open();
-                return command.ExecuteNonQuery();
-                
-            }
 
         }
 
@@ -89,39 +76,22 @@ namespace Blitz.DataAccess
         }
 
         //functions to display all the project avialable in table 
-        public IEnumerable<Project> GetProjects()
+        public List<Project> GetProjects()
         {
-            using (SqlConnection connection = DBCommon.GetConnection())
+            var data_t = DBCommon.GetResultDataTableBySql("SELECT * FROM Project_Table;");
+            List<Project> prj = new List<Project>();
+            for (int i = 0; i < data_t.Rows.Count; i++)
             {
-                SqlCommand command = new SqlCommand();
-                command.CommandType = CommandType.Text;
-                command.CommandText = " SELECT * FROM Project_Table; ";
-                command.Connection = connection;
-                
-                List<Project> prj = new List<Project>();
-                connection.Open();
-
-                using (SqlDataReader sdr = command.ExecuteReader())
-                {
-                    while (sdr.Read())
-                    {
-                        prj.Add(new Project
-                        {
-                            Id = Convert.ToInt32(sdr["Id"]),
-                            Name = sdr["Name"].ToString(),
-                            StartDate = (DateTime)sdr["StartDate"]
-                        });
-                    }
-                }
-                connection.Close();
-                return prj;
+                Project project = new Project();
+                project.Id = Convert.ToInt32(data_t.Rows[i]["Id"]);
+                project.Name = Convert.ToString(data_t.Rows[i]["Name"]);
+                project.StartDate = Convert.ToDateTime(data_t.Rows[i]["StartDate"]);
+                prj.Add(project);
             }
-
-
+            return prj;
         }
-
-        //function to update the existing project by id given
-        public int UpdateProject(Project p)
+            //function to update the existing project by id given
+            public int UpdateProject(Project p)
         {
             using (SqlConnection connection = DBCommon.GetConnection())
             {
